@@ -1,7 +1,7 @@
 module Main where
 
 import Graphics.UI.Gtk
-import qualified Graphics.Rendering.Cairo as C
+import qualified Graphics.Rendering.Cairo as Cairo
 
 white = Color 65535 65535 65535
 
@@ -39,9 +39,9 @@ render width height =
       mapM renderFunc pixels
   
 renderPixel width height x y = do
-   C.setSourceRGB r g b
-   C.rectangle x y 1 1
-   C.fill
+   Cairo.setSourceRGB r g b
+   Cairo.rectangle x y 1 1
+   Cairo.fill
    where (r, g, b) = getPixel x y width height
       
 
