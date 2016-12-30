@@ -6,14 +6,13 @@ import qualified Graphics.Rendering.Cairo as C
 white = Color 65535 65535 65535
 
 defaultWidth = 300
-
 defaultHeight = 300
 
 main= do
      initGUI
      window <- windowNew
      set window [windowTitle := "FPGameboy",
-                 windowDefaultWidth := 300, windowDefaultHeight := 300]
+                 windowDefaultWidth := (truncate defaultWidth), windowDefaultHeight := (truncate defaultHeight)]
 
      frame <- frameNew
      containerAdd window frame
