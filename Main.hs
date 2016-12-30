@@ -22,14 +22,14 @@ main= do
      widgetModifyBg canvas StateNormal white
 
      widgetShowAll window 
-     drawin <- widgetGetDrawWindow canvas
-     onExpose canvas (handleExpose drawin)
+     drawWin <- widgetGetDrawWindow canvas
+     onExpose canvas $ handleExpose drawWin
     
      onDestroy window mainQuit
      mainGUI
 
-handleExpose drawin x = do
-   renderWithDrawable drawin (render defaultWidth defaultHeight)
+handleExpose drawWin x = do
+   renderWithDrawable drawWin $ render defaultWidth defaultHeight
    return False
 
 render width height =
