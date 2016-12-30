@@ -17,4 +17,4 @@ data RegisterSet = RegisterSet
       f :: EightBitRegister,
       pc :: SixteenBitRegister,
       sp :: SixteenBitRegister
-   }
+   } deriving (Show)
