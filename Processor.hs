@@ -43,9 +43,9 @@ zero registerSet = getFlag registerSet 7
 
 setZero registerSet = setFlag registerSet 7
 
-addition registerSet = getFlag registerSet 6
+subtraction registerSet = getFlag registerSet 6
 
-setAddition registerSet = setFlag registerSet 6
+setSubtraction registerSet = setFlag registerSet 6
 
 halfCarry registerSet = getFlag registerSet 5
 
