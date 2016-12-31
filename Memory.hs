@@ -80,7 +80,7 @@ writeByteToBank (MemoryBank bankData) (Address address) byte = MemoryBank (bankD
 
 writeByteToBankAtIndex memoryBanks index address byte = case index of
    0 -> writeByteToBank (head memoryBanks) address byte : tail memoryBanks
-   _ -> (head memoryBanks) : writeByteToBankAtIndex (tail memoryBanks) (index - 1) address byte
+   _ -> head memoryBanks : writeByteToBankAtIndex (tail memoryBanks) (index - 1) address byte
 
 writeByteToMappedAddress memoryMap mappedAddress byte = case mappedAddress of
    FixedRomBank address -> let
