@@ -3,8 +3,8 @@ module Processor where
 import Data.Int
 import Data.Bits
 
-type EightBitRegister = Int8
-type SixteenBitRegister = Int16
+newtype EightBitRegister = EightBitRegister Int8
+newtype SixteenBitRegister = SixteenBitRegister Int16
 
 data RegisterSet = RegisterSet
    {
@@ -18,13 +18,13 @@ data RegisterSet = RegisterSet
       f :: EightBitRegister,
       pc :: SixteenBitRegister,
       sp :: SixteenBitRegister
-   } deriving (Show)
+   }
    
-sixteenBitRegister highRegister lowRegister =
+sixteenBitRegister (EightBitRegister highRegister) (EightBitRegister lowRegister) =
    let
       high = shift (fromIntegral highRegister) 8
       low = fromIntegral lowRegister
-   in high .|. low
+   in SixteenBitRegister $ high .|. low
 
 bc registerSet = sixteenBitRegister (b registerSet) (c registerSet)
 
@@ -32,11 +32,15 @@ de registerSet = sixteenBitRegister (d registerSet) (c registerSet)
 
 hl registerSet = sixteenBitRegister (h registerSet) (l registerSet)
 
-getFlag registerSet = testBit $ f registerSet
+testFlagBit (EightBitRegister register) = testBit register
+
+getFlag registerSet = testFlagBit $ f registerSet
+
+setFlagBit (EightBitRegister register) bit = EightBitRegister $ setBit register bit
 
 setFlag registerSet bit =
    let
-      newFlags = setBit (f registerSet) bit
+      newFlags = setFlagBit (f registerSet) bit
    in registerSet { f = newFlags }
 
 zero registerSet = getFlag registerSet 7

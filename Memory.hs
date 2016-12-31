@@ -4,7 +4,7 @@ import Data.Array
 import Data.Bits
 import Data.Int
 
-type MemoryBank = Array Int16 Int8
+newtype MemoryBank = MemoryBank (Array Int16 Int8)
 
 data MemoryMap = MemoryMap
    {
@@ -17,7 +17,7 @@ data MemoryMap = MemoryMap
 
 kb size = shift 1 10
 
-createBank size = array (0, size - 1) [(i, 0) | i <- [0..size - 1]]
+createBank size = MemoryBank $ array (0, size - 1) [(i, 0) | i <- [0..size - 1]]
 
 createBanks count size = replicate count $ createBank size
 
