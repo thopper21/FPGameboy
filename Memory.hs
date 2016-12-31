@@ -29,7 +29,8 @@ data MemoryMap = MemoryMap
       workingRamBanks :: [MemoryBank],
       spriteAttributeTable :: MemoryBank,
       ioPorts :: MemoryBank,
-      highRam :: MemoryBank
+      highRam :: MemoryBank,
+      interruptEnableRegister :: Word8
    }
 
 kb size = shift 1 10
@@ -46,7 +47,8 @@ newMemoryMap romBankCount externalRamBankCount workingRamBankCount = MemoryMap
       workingRamBanks = createBanks workingRamBankCount $ kb 4,
       spriteAttributeTable = createBank 160,
       ioPorts = createBank 128,
-      highRam = createBank 127
+      highRam = createBank 127,
+      interruptEnableRegister = 0
    }
 
 createMappedAddress (Address address)
@@ -76,7 +78,7 @@ readByteFromMappedAddress memoryMap mappedAddress = case mappedAddress of
    Unusable -> 0
    IOPorts address -> readByteFromBank (ioPorts memoryMap) address
    HighRam address -> readByteFromBank (highRam memoryMap) address
-   InterruptEnableRegister -> 0
+   InterruptEnableRegister -> interruptEnableRegister memoryMap
 
 readByte memoryMap address = readByteFromMappedAddress memoryMap $ createMappedAddress address
 
@@ -115,6 +117,6 @@ writeByteToMappedAddress memoryMap mappedAddress byte = case mappedAddress of
    HighRam address -> let
          newHighRam = writeByteToBank (highRam memoryMap) address byte
       in memoryMap { highRam = newHighRam }
-   InterruptEnableRegister -> memoryMap
+   InterruptEnableRegister -> memoryMap { interruptEnableRegister = byte }
 
 writeByte memoryMap address = writeByteToMappedAddress memoryMap $ createMappedAddress address
