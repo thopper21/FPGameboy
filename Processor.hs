@@ -19,7 +19,7 @@ data RegisterSet = RegisterSet
       pc :: SixteenBitRegister,
       sp :: SixteenBitRegister
    } deriving (Show)
-
+   
 sixteenBitRegister highRegister lowRegister =
    let
       high = shift (fromIntegral highRegister) 8

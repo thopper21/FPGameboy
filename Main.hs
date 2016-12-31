@@ -3,6 +3,7 @@ module Main where
 import Graphics.UI.Gtk
 import qualified Graphics.Rendering.Cairo as Cairo
 import Processor
+import Memory
 
 white = Color 65535 65535 65535
 
