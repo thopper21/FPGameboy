@@ -2,9 +2,9 @@ module Memory where
 
 import Data.Array
 import Data.Bits
-import Data.Int
+import Data.Word
 
-newtype MemoryBank = MemoryBank (Array Int16 Int8)
+newtype MemoryBank = MemoryBank (Array Word16 Word8)
 
 data MemoryMap = MemoryMap
    {
@@ -29,3 +29,4 @@ newMemoryMap romBankCount workingRamBankCount = MemoryMap
       workingRamBanks = createBanks workingRamBankCount $ kb 4,
       highRam = createBank 127
    }
+

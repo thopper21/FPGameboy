@@ -1,10 +1,10 @@
 module Processor where
 
-import Data.Int
 import Data.Bits
+import Data.Word
 
-newtype EightBitRegister = EightBitRegister Int8
-newtype SixteenBitRegister = SixteenBitRegister Int16
+newtype EightBitRegister = EightBitRegister Word8
+newtype SixteenBitRegister = SixteenBitRegister Word16
 
 data RegisterSet = RegisterSet
    {
