@@ -31,3 +31,18 @@ bc registerSet = combineRegisters (b registerSet) (c registerSet)
 de registerSet = combineRegisters (d registerSet) (c registerSet)
 
 hl registerSet = combineRegisters (h registerSet) (l registerSet)
+
+getFlag registerSet bit = testBit (f registerSet) bit
+
+setFlag registerSet bit =
+   let
+      newFlags = setBit (f registerSet) bit
+   in registerSet { f = newFlags }
+
+zero registerSet = getFlag registerSet 7
+
+setZero registerSet = setFlag registerSet 7
+
+carry registerSet = getFlag registerSet 5
+
+setCarry registerSet = setFlag registerSet 5
