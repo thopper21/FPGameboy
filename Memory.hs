@@ -27,6 +27,8 @@ data MemoryMap = MemoryMap
       videoRam :: MemoryBank,
       externalRamBanks :: [MemoryBank],
       workingRamBanks :: [MemoryBank],
+      spriteAttributeTable :: MemoryBank,
+      ioPorts :: MemoryBank,
       highRam :: MemoryBank
    }
 
@@ -42,6 +44,8 @@ newMemoryMap romBankCount externalRamBankCount workingRamBankCount = MemoryMap
       videoRam = createBank $ kb 8,
       externalRamBanks = createBanks externalRamBankCount $ kb 8,
       workingRamBanks = createBanks workingRamBankCount $ kb 4,
+      spriteAttributeTable = createBank 160,
+      ioPorts = createBank 128,
       highRam = createBank 127
    }
 
@@ -68,9 +72,9 @@ readByteFromMappedAddress memoryMap mappedAddress = case mappedAddress of
    ExternalRam address -> readByteFromBank (head $ externalRamBanks memoryMap) address
    FixedWorkingRam address -> readByteFromBank (head $ workingRamBanks memoryMap) address
    SwitchableWorkingRam address -> readByteFromBank (workingRamBanks memoryMap !! 1) address
-   ObjectAttributeMemory address -> 0
+   ObjectAttributeMemory address -> readByteFromBank (spriteAttributeTable memoryMap) address
    Unusable -> 0
-   IOPorts address -> 0
+   IOPorts address -> readByteFromBank (ioPorts memoryMap) address
    HighRam address -> readByteFromBank (highRam memoryMap) address
    InterruptEnableRegister -> 0
 
@@ -101,9 +105,13 @@ writeByteToMappedAddress memoryMap mappedAddress byte = case mappedAddress of
    SwitchableWorkingRam address -> let
          newWorkingRamBanks = writeByteToBankAtIndex (workingRamBanks memoryMap) 1 address byte
       in memoryMap { workingRamBanks = newWorkingRamBanks }
-   ObjectAttributeMemory address -> memoryMap
+   ObjectAttributeMemory address -> let
+         newSpriteAttributeTable = writeByteToBank (spriteAttributeTable memoryMap) address byte
+      in memoryMap { spriteAttributeTable = newSpriteAttributeTable }
    Unusable -> memoryMap
-   IOPorts address -> memoryMap
+   IOPorts address -> let
+         newIOPorts = writeByteToBank (ioPorts memoryMap) address byte
+      in memoryMap { ioPorts = newIOPorts }
    HighRam address -> let
          newHighRam = writeByteToBank (highRam memoryMap) address byte
       in memoryMap { highRam = newHighRam }
