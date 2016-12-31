@@ -44,7 +44,8 @@ readByte memoryMap (Address address)
    | address < 0xFE00 = readByte memoryMap $ Address (address - 0x2000)
    | address < 0xFEA0 = 0
    | address < 0xFF00 = 0
-   | address < 0xFF80 = readByteFromBank (highRam memoryMap) (address - 0xFF00)
+   | address < 0xFF80 = 0
+   | address < 0xFFFF = readByteFromBank (highRam memoryMap) (address - 0xFF00)
    | otherwise = 0
 
 writeByteToBank (MemoryBank bankData) address byte = MemoryBank (bankData // [(address, byte)])
@@ -81,7 +82,8 @@ writeByte memoryMap (Address address) byte
    | address < 0xFE00 = writeByte memoryMap (Address (address - 0x2000)) byte
    | address < 0xFEA0 = memoryMap
    | address < 0xFF00 = memoryMap
-   | address < 0xFF80 = let
+   | address < 0xFF80 = memoryMap
+   | address < 0xFFFF = let
          newHighRam = writeByteToBank (highRam memoryMap) (address - 0xFF00) byte
       in memoryMap { highRam = newHighRam }
    | otherwise = memoryMap
