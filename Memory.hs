@@ -8,6 +8,19 @@ newtype MemoryBank = MemoryBank (Array Word16 Word8)
 
 newtype Address = Address Word16
 
+data MappedAddress =
+   FixedRomBank Address |
+   SwitchableRomBank Address |
+   VideoRam Address |
+   ExternalRam Address |
+   FixedWorkRam Address |
+   SwitchableWorkRam Address |
+   ObjectAttributeMemory Address |
+   Unusable |
+   IOPorts Address |
+   HighRam Address |
+   InterruptEnableRegister
+
 data MemoryMap = MemoryMap
    {
       romBanks :: [MemoryBank],
@@ -32,58 +45,74 @@ newMemoryMap romBankCount externalRamBankCount workingRamBankCount = MemoryMap
       highRam = createBank 127
    }
 
-readByteFromBank (MemoryBank bankData) address = bankData ! address
+createMappedAddress (Address address)
+   | address < 0x4000 = FixedRomBank $ Address address
+   | address < 0x8000 = SwitchableRomBank $ Address (address - 0x4000)
+   | address < 0xA000 = VideoRam $ Address (address - 0x8000)
+   | address < 0xC000 = ExternalRam $ Address (address - 0xA000)
+   | address < 0xD000 = FixedWorkRam $ Address (address - 0xC000)
+   | address < 0xE000 = SwitchableWorkRam $ Address (address - 0xD000)
+   | address < 0xFE00 = createMappedAddress $ Address (address - 0x2000)
+   | address < 0xFEA0 = ObjectAttributeMemory $ Address (address - 0xFE00)
+   | address < 0xFF00 = Unusable
+   | address < 0xFF80 = IOPorts $ Address (address - 0xFF00)
+   | address < 0xFFFF = HighRam $ Address (address - 0xFF80)
+   | otherwise = InterruptEnableRegister
 
-readByte memoryMap (Address address)
-   | address < 0x4000 = readByteFromBank (head $ romBanks memoryMap) address
-   | address < 0x8000 = readByteFromBank (romBanks memoryMap !! 1) (address - 0x4000)
-   | address < 0xA000 = readByteFromBank (videoRam memoryMap) (address - 0x8000)
-   | address < 0xC000 = readByteFromBank (head $ externalRamBanks memoryMap) (address - 0xA000)
-   | address < 0xD000 = readByteFromBank (head $ workingRamBanks memoryMap) (address - 0xC000)
-   | address < 0xE000 = readByteFromBank (workingRamBanks memoryMap !! 1) (address - 0xD000)
-   | address < 0xFE00 = readByte memoryMap $ Address (address - 0x2000)
-   | address < 0xFEA0 = 0
-   | address < 0xFF00 = 0
-   | address < 0xFF80 = 0
-   | address < 0xFFFF = readByteFromBank (highRam memoryMap) (address - 0xFF00)
-   | otherwise = 0
+readByteFromBank (MemoryBank bankData) (Address address) = bankData ! address
 
-writeByteToBank (MemoryBank bankData) address byte = MemoryBank (bankData // [(address, byte)])
+readByteFromMappedAddress memoryMap mappedAddress = case mappedAddress of
+   FixedRomBank address -> readByteFromBank (head $ romBanks memoryMap) address
+   SwitchableRomBank address -> readByteFromBank (romBanks memoryMap !! 1) address
+   VideoRam address -> readByteFromBank (videoRam memoryMap) address
+   ExternalRam address -> readByteFromBank (head $ externalRamBanks memoryMap) address
+   FixedWorkRam address -> readByteFromBank (head $ workingRamBanks memoryMap) address
+   SwitchableWorkRam address -> readByteFromBank (workingRamBanks memoryMap !! 1) address
+   ObjectAttributeMemory address -> 0
+   Unusable -> 0
+   IOPorts address -> 0
+   HighRam address -> readByteFromBank (highRam memoryMap) address
+   InterruptEnableRegister -> 0
 
-writeByte memoryMap (Address address) byte
-   | address < 0x4000 = let
+readByte memoryMap address = readByteFromMappedAddress memoryMap $ createMappedAddress address
+
+writeByteToBank (MemoryBank bankData) (Address address) byte = MemoryBank (bankData // [(address, byte)])
+
+writeByteToMappedAddress memoryMap mappedAddress byte = case mappedAddress of
+   FixedRomBank address -> let
          oldRomBanks = romBanks memoryMap
          newRomBank = writeByteToBank (head oldRomBanks) address byte
          newRomBanks = newRomBank : tail oldRomBanks
       in memoryMap { romBanks = newRomBanks }
-   | address < 0x8000 = let
+   SwitchableRomBank address -> let
          oldRomBanks = romBanks memoryMap
-         newRomBank = writeByteToBank (oldRomBanks !! 1) (address - 0x4000) byte
+         newRomBank = writeByteToBank (oldRomBanks !! 1) address byte
          newRomBanks = head oldRomBanks : newRomBank : drop 2 oldRomBanks
       in memoryMap { romBanks = newRomBanks }
-   | address < 0xA000 = let
-         newVideoRam = writeByteToBank (videoRam memoryMap) (address - 0x8000) byte
+   VideoRam address -> let
+         newVideoRam = writeByteToBank (videoRam memoryMap) address byte
       in memoryMap { videoRam = newVideoRam }
-   | address < 0xC000 = let
+   ExternalRam address -> let
          oldExternalRamBanks = externalRamBanks memoryMap
-         newExternalRamBank = writeByteToBank (head oldExternalRamBanks) (address - 0xA000) byte
+         newExternalRamBank = writeByteToBank (head oldExternalRamBanks) address byte
          newExternalRamBanks = newExternalRamBank : tail oldExternalRamBanks
       in memoryMap { externalRamBanks = newExternalRamBanks }
-   | address < 0xD000 = let
+   FixedWorkRam address -> let
          oldWorkingRamBanks = workingRamBanks memoryMap
-         newWorkingRamBank = writeByteToBank (head oldWorkingRamBanks) (address - 0xC000) byte
+         newWorkingRamBank = writeByteToBank (head oldWorkingRamBanks) address byte
          newWorkingRamBanks = newWorkingRamBank : tail oldWorkingRamBanks
       in memoryMap { workingRamBanks = newWorkingRamBanks }
-   | address < 0xE000 = let
+   SwitchableWorkRam address -> let
          oldWorkingRamBanks = workingRamBanks memoryMap
-         newWorkingRamBank = writeByteToBank (oldWorkingRamBanks !! 1) (address - 0x4000) byte
+         newWorkingRamBank = writeByteToBank (oldWorkingRamBanks !! 1) address byte
          newWorkingRamBanks = head oldWorkingRamBanks : newWorkingRamBank : drop 2 oldWorkingRamBanks
       in memoryMap { workingRamBanks = newWorkingRamBanks }
-   | address < 0xFE00 = writeByte memoryMap (Address (address - 0x2000)) byte
-   | address < 0xFEA0 = memoryMap
-   | address < 0xFF00 = memoryMap
-   | address < 0xFF80 = memoryMap
-   | address < 0xFFFF = let
-         newHighRam = writeByteToBank (highRam memoryMap) (address - 0xFF00) byte
+   ObjectAttributeMemory address -> memoryMap
+   Unusable -> memoryMap
+   IOPorts address -> memoryMap
+   HighRam address -> let
+         newHighRam = writeByteToBank (highRam memoryMap) address byte
       in memoryMap { highRam = newHighRam }
-   | otherwise = memoryMap
+   InterruptEnableRegister -> memoryMap
+
+writeByte memoryMap address = writeByteToMappedAddress memoryMap $ createMappedAddress address
