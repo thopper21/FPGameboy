@@ -13,8 +13,8 @@ data MappedAddress =
    SwitchableRomBank Address |
    VideoRam Address |
    ExternalRam Address |
-   FixedWorkRam Address |
-   SwitchableWorkRam Address |
+   FixedWorkingRam Address |
+   SwitchableWorkingRam Address |
    ObjectAttributeMemory Address |
    Unusable |
    IOPorts Address |
@@ -50,8 +50,8 @@ createMappedAddress (Address address)
    | address < 0x8000 = SwitchableRomBank $ Address (address - 0x4000)
    | address < 0xA000 = VideoRam $ Address (address - 0x8000)
    | address < 0xC000 = ExternalRam $ Address (address - 0xA000)
-   | address < 0xD000 = FixedWorkRam $ Address (address - 0xC000)
-   | address < 0xE000 = SwitchableWorkRam $ Address (address - 0xD000)
+   | address < 0xD000 = FixedWorkingRam $ Address (address - 0xC000)
+   | address < 0xE000 = SwitchableWorkingRam $ Address (address - 0xD000)
    | address < 0xFE00 = createMappedAddress $ Address (address - 0x2000)
    | address < 0xFEA0 = ObjectAttributeMemory $ Address (address - 0xFE00)
    | address < 0xFF00 = Unusable
@@ -66,8 +66,8 @@ readByteFromMappedAddress memoryMap mappedAddress = case mappedAddress of
    SwitchableRomBank address -> readByteFromBank (romBanks memoryMap !! 1) address
    VideoRam address -> readByteFromBank (videoRam memoryMap) address
    ExternalRam address -> readByteFromBank (head $ externalRamBanks memoryMap) address
-   FixedWorkRam address -> readByteFromBank (head $ workingRamBanks memoryMap) address
-   SwitchableWorkRam address -> readByteFromBank (workingRamBanks memoryMap !! 1) address
+   FixedWorkingRam address -> readByteFromBank (head $ workingRamBanks memoryMap) address
+   SwitchableWorkingRam address -> readByteFromBank (workingRamBanks memoryMap !! 1) address
    ObjectAttributeMemory address -> 0
    Unusable -> 0
    IOPorts address -> 0
@@ -95,10 +95,10 @@ writeByteToMappedAddress memoryMap mappedAddress byte = case mappedAddress of
    ExternalRam address -> let
          newExternalRamBanks = writeByteToBankAtIndex (externalRamBanks memoryMap) 0 address byte
       in memoryMap { externalRamBanks = newExternalRamBanks }
-   FixedWorkRam address -> let
+   FixedWorkingRam address -> let
          newWorkingRamBanks = writeByteToBankAtIndex (workingRamBanks memoryMap) 0 address byte
       in memoryMap { workingRamBanks = newWorkingRamBanks }
-   SwitchableWorkRam address -> let
+   SwitchableWorkingRam address -> let
          newWorkingRamBanks = writeByteToBankAtIndex (workingRamBanks memoryMap) 1 address byte
       in memoryMap { workingRamBanks = newWorkingRamBanks }
    ObjectAttributeMemory address -> memoryMap
