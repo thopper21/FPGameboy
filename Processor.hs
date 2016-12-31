@@ -43,6 +43,14 @@ zero registerSet = getFlag registerSet 7
 
 setZero registerSet = setFlag registerSet 7
 
-carry registerSet = getFlag registerSet 5
+addition registerSet = getFlag registerSet 6
 
-setCarry registerSet = setFlag registerSet 5
+setAddition registerSet = setFlag registerSet 6
+
+halfCarry registerSet = getFlag registerSet 5
+
+setHalfCarry registerSet = setFlag registerSet 5
+
+carry registerSet = getFlag registerSet 4
+
+setCarry registerSet = setFlag registerSet 4
