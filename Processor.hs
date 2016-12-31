@@ -20,17 +20,17 @@ data RegisterSet = RegisterSet
       sp :: SixteenBitRegister
    } deriving (Show)
 
-combineRegisters highRegister lowRegister =
+sixteenBitRegister highRegister lowRegister =
    let
       high = shift (fromIntegral highRegister) 8
       low = fromIntegral lowRegister
    in high .|. low
 
-bc registerSet = combineRegisters (b registerSet) (c registerSet)
+bc registerSet = sixteenBitRegister (b registerSet) (c registerSet)
 
-de registerSet = combineRegisters (d registerSet) (c registerSet)
+de registerSet = sixteenBitRegister (d registerSet) (c registerSet)
 
-hl registerSet = combineRegisters (h registerSet) (l registerSet)
+hl registerSet = sixteenBitRegister (h registerSet) (l registerSet)
 
 getFlag registerSet bit = testBit (f registerSet) bit
 
