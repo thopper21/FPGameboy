@@ -78,34 +78,28 @@ readByte memoryMap address = readByteFromMappedAddress memoryMap $ createMappedA
 
 writeByteToBank (MemoryBank bankData) (Address address) byte = MemoryBank (bankData // [(address, byte)])
 
+writeByteToBankAtIndex memoryBanks index address byte = case index of
+   0 -> writeByteToBank (head memoryBanks) address byte : tail memoryBanks
+   _ -> (head memoryBanks) : writeByteToBankAtIndex (tail memoryBanks) (index - 1) address byte
+
 writeByteToMappedAddress memoryMap mappedAddress byte = case mappedAddress of
    FixedRomBank address -> let
-         oldRomBanks = romBanks memoryMap
-         newRomBank = writeByteToBank (head oldRomBanks) address byte
-         newRomBanks = newRomBank : tail oldRomBanks
+         newRomBanks = writeByteToBankAtIndex (romBanks memoryMap) 0 address byte
       in memoryMap { romBanks = newRomBanks }
    SwitchableRomBank address -> let
-         oldRomBanks = romBanks memoryMap
-         newRomBank = writeByteToBank (oldRomBanks !! 1) address byte
-         newRomBanks = head oldRomBanks : newRomBank : drop 2 oldRomBanks
+         newRomBanks = writeByteToBankAtIndex (romBanks memoryMap) 1 address byte
       in memoryMap { romBanks = newRomBanks }
    VideoRam address -> let
          newVideoRam = writeByteToBank (videoRam memoryMap) address byte
       in memoryMap { videoRam = newVideoRam }
    ExternalRam address -> let
-         oldExternalRamBanks = externalRamBanks memoryMap
-         newExternalRamBank = writeByteToBank (head oldExternalRamBanks) address byte
-         newExternalRamBanks = newExternalRamBank : tail oldExternalRamBanks
+         newExternalRamBanks = writeByteToBankAtIndex (externalRamBanks memoryMap) 0 address byte
       in memoryMap { externalRamBanks = newExternalRamBanks }
    FixedWorkRam address -> let
-         oldWorkingRamBanks = workingRamBanks memoryMap
-         newWorkingRamBank = writeByteToBank (head oldWorkingRamBanks) address byte
-         newWorkingRamBanks = newWorkingRamBank : tail oldWorkingRamBanks
+         newWorkingRamBanks = writeByteToBankAtIndex (workingRamBanks memoryMap) 0 address byte
       in memoryMap { workingRamBanks = newWorkingRamBanks }
    SwitchableWorkRam address -> let
-         oldWorkingRamBanks = workingRamBanks memoryMap
-         newWorkingRamBank = writeByteToBank (oldWorkingRamBanks !! 1) address byte
-         newWorkingRamBanks = head oldWorkingRamBanks : newWorkingRamBank : drop 2 oldWorkingRamBanks
+         newWorkingRamBanks = writeByteToBankAtIndex (workingRamBanks memoryMap) 1 address byte
       in memoryMap { workingRamBanks = newWorkingRamBanks }
    ObjectAttributeMemory address -> memoryMap
    Unusable -> memoryMap
