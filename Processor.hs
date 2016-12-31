@@ -32,7 +32,7 @@ de registerSet = sixteenBitRegister (d registerSet) (c registerSet)
 
 hl registerSet = sixteenBitRegister (h registerSet) (l registerSet)
 
-getFlag registerSet bit = testBit (f registerSet) bit
+getFlag registerSet = testBit (f registerSet)
 
 setFlag registerSet bit =
    let

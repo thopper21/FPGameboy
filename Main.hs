@@ -13,7 +13,7 @@ main= do
      initGUI
      window <- windowNew
      set window [windowTitle := "FPGameboy",
-                 windowDefaultWidth := (truncate defaultWidth), windowDefaultHeight := (truncate defaultHeight)]
+                 windowDefaultWidth := truncate defaultWidth, windowDefaultHeight := truncate defaultHeight]
 
      frame <- frameNew
      containerAdd window frame
