@@ -1,9 +1,11 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Processor where
 
 import Data
 import Data.Bits
 
-newtype EightBitRegister = EightBitRegister GBByte
+newtype EightBitRegister = EightBitRegister GBByte deriving ( Bits, Enum, Eq, Integral, Num, Ord, Real )
+
 newtype SixteenBitRegister = SixteenBitRegister GBWord
 
 data RegisterSet = RegisterSet
@@ -20,7 +22,7 @@ data RegisterSet = RegisterSet
       sp :: SixteenBitRegister
    }
    
-sixteenBitRegister (EightBitRegister highRegister) (EightBitRegister lowRegister) =
+sixteenBitRegister highRegister lowRegister =
    let
       high = shift (fromIntegral highRegister) 8
       low = fromIntegral lowRegister
@@ -32,13 +34,9 @@ de registerSet = sixteenBitRegister (d registerSet) (c registerSet)
 
 hl registerSet = sixteenBitRegister (h registerSet) (l registerSet)
 
-testFlagBit (EightBitRegister register) = testBit register
+getFlag registerSet = testBit $ f registerSet
 
-getFlag registerSet = testFlagBit $ f registerSet
-
-setFlagBit (EightBitRegister register) bit = EightBitRegister $ setBit register bit
-
-setFlag registerSet bit = registerSet { f = setFlagBit (f registerSet) bit }
+setFlag registerSet bit = registerSet { f = setBit (f registerSet) bit }
 
 zero registerSet = getFlag registerSet 7
 

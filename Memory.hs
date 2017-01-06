@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Memory where
 
 import Data
@@ -6,7 +7,7 @@ import Data.Bits
 
 newtype MemoryBank = MemoryBank (Array GBWord GBByte)
 
-newtype Address = Address GBWord
+newtype Address = Address GBWord deriving ( Eq, Num, Ord )
 
 data MappedAddress =
    FixedRomBank Address |
@@ -51,18 +52,18 @@ newMemoryMap romBankCount externalRamBankCount workingRamBankCount = MemoryMap
       interruptEnableRegister = Byte 0
    }
 
-createMappedAddress (Address address)
-   | address < 0x4000 = FixedRomBank $ Address address
-   | address < 0x8000 = SwitchableRomBank $ Address (address - 0x4000)
-   | address < 0xA000 = VideoRam $ Address (address - 0x8000)
-   | address < 0xC000 = ExternalRam $ Address (address - 0xA000)
-   | address < 0xD000 = FixedWorkingRam $ Address (address - 0xC000)
-   | address < 0xE000 = SwitchableWorkingRam $ Address (address - 0xD000)
-   | address < 0xFE00 = createMappedAddress $ Address (address - 0x2000)
-   | address < 0xFEA0 = ObjectAttributeMemory $ Address (address - 0xFE00)
+createMappedAddress address
+   | address < 0x4000 = FixedRomBank address
+   | address < 0x8000 = SwitchableRomBank $ address - 0x4000
+   | address < 0xA000 = VideoRam $ address - 0x8000
+   | address < 0xC000 = ExternalRam $ address - 0xA000
+   | address < 0xD000 = FixedWorkingRam $ address - 0xC000
+   | address < 0xE000 = SwitchableWorkingRam $ address - 0xD000
+   | address < 0xFE00 = createMappedAddress $ address - 0x2000
+   | address < 0xFEA0 = ObjectAttributeMemory $ address - 0xFE00
    | address < 0xFF00 = Unusable
-   | address < 0xFF80 = IOPorts $ Address (address - 0xFF00)
-   | address < 0xFFFF = HighRam $ Address (address - 0xFF80)
+   | address < 0xFF80 = IOPorts $ address - 0xFF00
+   | address < 0xFFFF = HighRam $ address - 0xFF80
    | otherwise = InterruptEnableRegister
 
 readByteFromBank (MemoryBank bankData) (Address address) = bankData ! address
