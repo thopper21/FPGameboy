@@ -36,7 +36,7 @@ data MemoryMap = MemoryMap
 
 kb size = shift 1 10
 
-createBank size = MemoryBank $ array (Word 0, Word $ size - 1) [(Word i, Byte 0) | i <- [0..size - 1]]
+createBank size = MemoryBank $ listArray (Word 0, Word $ fromIntegral $ size - 1) (replicate (size - 1) (Byte 0))
 
 createBanks count size = replicate count $ createBank size
 
