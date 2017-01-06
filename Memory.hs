@@ -1,12 +1,12 @@
 module Memory where
 
+import Data
 import Data.Array
 import Data.Bits
-import Data.Word
 
-newtype MemoryBank = MemoryBank (Array Word16 Word8)
+newtype MemoryBank = MemoryBank (Array GBWord GBByte)
 
-newtype Address = Address Word16
+newtype Address = Address GBWord
 
 data MappedAddress =
    FixedRomBank Address |
@@ -30,12 +30,12 @@ data MemoryMap = MemoryMap
       spriteAttributeTable :: MemoryBank,
       ioPorts :: MemoryBank,
       highRam :: MemoryBank,
-      interruptEnableRegister :: Word8
+      interruptEnableRegister :: GBByte
    }
 
 kb size = shift 1 10
 
-createBank size = MemoryBank $ array (0, size - 1) [(i, 0) | i <- [0..size - 1]]
+createBank size = MemoryBank $ array (Word 0, Word $ size - 1) [(Word i, Byte 0) | i <- [0..size - 1]]
 
 createBanks count size = replicate count $ createBank size
 
@@ -48,7 +48,7 @@ newMemoryMap romBankCount externalRamBankCount workingRamBankCount = MemoryMap
       spriteAttributeTable = createBank 160,
       ioPorts = createBank 128,
       highRam = createBank 127,
-      interruptEnableRegister = 0
+      interruptEnableRegister = Byte 0
    }
 
 createMappedAddress (Address address)
