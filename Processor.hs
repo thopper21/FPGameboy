@@ -38,10 +38,7 @@ getFlag registerSet = testFlagBit $ f registerSet
 
 setFlagBit (EightBitRegister register) bit = EightBitRegister $ setBit register bit
 
-setFlag registerSet bit =
-   let
-      newFlags = setFlagBit (f registerSet) bit
-   in registerSet { f = newFlags }
+setFlag registerSet bit = registerSet { f = setFlagBit (f registerSet) bit }
 
 zero registerSet = getFlag registerSet 7
 
