@@ -21,35 +21,37 @@ data RegisterSet = RegisterSet
       pc :: SixteenBitRegister,
       sp :: SixteenBitRegister
    }
-   
-sixteenBitRegister highRegister lowRegister =
+
+sixteenBitRegister getHighRegister getLowRegister registerSet =
    let
+      highRegister = getHighRegister registerSet
+      lowRegister = getLowRegister registerSet
       high = shift (fromIntegral highRegister) 8
       low = fromIntegral lowRegister
    in SixteenBitRegister $ high .|. low
+   
+bc = sixteenBitRegister b c
 
-bc registerSet = sixteenBitRegister (b registerSet) (c registerSet)
+de = sixteenBitRegister d c
 
-de registerSet = sixteenBitRegister (d registerSet) (c registerSet)
+hl = sixteenBitRegister h l
 
-hl registerSet = sixteenBitRegister (h registerSet) (l registerSet)
+getFlag bit registerSet = flip testBit bit $ f registerSet
 
-getFlag registerSet = testBit $ f registerSet
+setFlag bit registerSet = registerSet { f = flip setBit bit $ f registerSet }
 
-setFlag registerSet bit = registerSet { f = setBit (f registerSet) bit }
+zero = getFlag 7
 
-zero registerSet = getFlag registerSet 7
+setZero = setFlag 7
 
-setZero registerSet = setFlag registerSet 7
+subtraction = getFlag 6
 
-subtraction registerSet = getFlag registerSet 6
+setSubtraction = setFlag 6
 
-setSubtraction registerSet = setFlag registerSet 6
+halfCarry = getFlag 5
 
-halfCarry registerSet = getFlag registerSet 5
+setHalfCarry = setFlag 5
 
-setHalfCarry registerSet = setFlag registerSet 5
+carry = getFlag 4
 
-carry registerSet = getFlag registerSet 4
-
-setCarry registerSet = setFlag registerSet 4
+setCarry = setFlag 4
