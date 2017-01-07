@@ -1,5 +1,16 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Register where
+module Register
+   (EightBitRegister,
+   SixteenBitRegister,
+   RegisterSet,
+   emptyRegisterSet,
+   a, b, c, d, e, h, l, f,
+   bc, de, hl, pc, sp,
+   zero, setZero,
+   subtraction, setSubtraction,
+   halfCarry, setHalfCarry,
+   carry, setCarry)
+where
 
 import Data
 import Data.Bits
@@ -20,6 +31,25 @@ data RegisterSet = RegisterSet
       f :: EightBitRegister,
       pc :: SixteenBitRegister,
       sp :: SixteenBitRegister
+   }
+
+emptyEightBitRegister = EightBitRegister . Byte $ 0
+
+emptySixteenBitRegister = SixteenBitRegister . Word $ 0
+   
+emptyRegisterSet =
+   RegisterSet
+   {
+      a = emptyEightBitRegister,
+      b = emptyEightBitRegister,
+      c = emptyEightBitRegister,
+      d = emptyEightBitRegister,
+      e = emptyEightBitRegister,
+      h = emptyEightBitRegister,
+      l = emptyEightBitRegister,
+      f = emptyEightBitRegister,
+      pc = emptySixteenBitRegister,
+      sp = emptySixteenBitRegister
    }
 
 sixteenBitRegister getHighRegister getLowRegister registerSet =

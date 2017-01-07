@@ -1,5 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Memory where
+module Memory
+   (Address(..),
+   newMemoryMap,
+   readByte, writeByte)
+where
 
 import Data
 import Data.Array
