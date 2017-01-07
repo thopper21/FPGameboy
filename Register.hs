@@ -5,15 +5,19 @@ module Register
    RegisterSet,
    emptyRegisterSet,
    a, b, c, d, e, h, l, f,
+   setA, setB, setC, setD, setE, setH, setL,
    bc, de, hl, pc, sp,
+   setPC, setSP,
    zero, setZero,
    subtraction, setSubtraction,
    halfCarry, setHalfCarry,
-   carry, setCarry)
+   carry, setCarry,
+   toAddress)
 where
 
 import Data
 import Data.Bits
+import Memory
 
 newtype EightBitRegister = EightBitRegister GBByte deriving ( Bits, Enum, Eq, Integral, Num, Ord, Real )
 
@@ -59,12 +63,30 @@ sixteenBitRegister getHighRegister getLowRegister registerSet =
       high = shift (fromIntegral highRegister) 8
       low = fromIntegral lowRegister
    in SixteenBitRegister $ high .|. low
-   
+
 bc = sixteenBitRegister b c
 
 de = sixteenBitRegister d c
 
 hl = sixteenBitRegister h l
+
+setA registerSet byte = registerSet { a = EightBitRegister byte }
+
+setB registerSet byte = registerSet { b = EightBitRegister byte }
+
+setC registerSet byte = registerSet { c = EightBitRegister byte }
+
+setD registerSet byte = registerSet { d = EightBitRegister byte }
+
+setE registerSet byte = registerSet { e = EightBitRegister byte }
+
+setH registerSet byte = registerSet { h = EightBitRegister byte }
+
+setL registerSet byte = registerSet { l = EightBitRegister byte }
+
+setPC registerSet word = registerSet { pc = SixteenBitRegister word }
+
+setSP registerSet word = registerSet { sp = SixteenBitRegister word }
 
 getFlag bit registerSet = flip testBit bit $ f registerSet
 
@@ -85,3 +107,5 @@ setHalfCarry = setFlag 5
 carry = getFlag 4
 
 setCarry = setFlag 4
+
+toAddress (SixteenBitRegister word) = Address word

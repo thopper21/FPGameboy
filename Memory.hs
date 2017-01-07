@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Memory
    (Address(..),
+   MemoryMap,
    newMemoryMap,
    readByte, writeByte)
 where
