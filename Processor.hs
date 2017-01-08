@@ -4,23 +4,28 @@ import Data
 import Memory
 import Register
 
-data ProcessorState =
-   ProcessorState
-   {
-      registers :: RegisterSet,
-      memory :: MemoryMap,
-      time :: Int
-   }
+data Argument = A | B | C | D | E | H | L | HL | ImmediateByte
+
+data Instruction =
+   LD Argument Argument
+
+newtype Time = Time Int   
    
-immediateByte state = readByte (memory state) (toAddress (pc . registers $ state))
+data Operation = Operation Time Instruction
 
-loadRegister state setRegister getByte = state { registers = setRegister (registers state) (getByte state) }
-
-performInstruction state (Byte opCode) =
+operation (Byte opCode) =
    case opCode of
-      0x06 -> loadRegister state setB immediateByte
-      0x0E -> loadRegister state setC immediateByte
-      0x16 -> loadRegister state setD immediateByte
-      0x1E -> loadRegister state setE immediateByte
-      0x26 -> loadRegister state setH immediateByte
-      0x2E -> loadRegister state setL immediateByte
+      0x06 -> LD B ImmediateByte
+      0x0E -> LD C ImmediateByte
+      0x16 -> LD D ImmediateByte
+      0x1E -> LD E ImmediateByte
+      0x26 -> LD H ImmediateByte
+      0x2E -> LD L ImmediateByte
+      0x7F -> LD A A
+      0x78 -> LD A B
+      0x79 -> LD A C
+      0x7A -> LD A D
+      0x7B -> LD A E
+      0x7C -> LD A H
+      0x7D -> LD A L
+      0x7E -> LD A HL

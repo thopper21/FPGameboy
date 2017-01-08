@@ -6,6 +6,7 @@ module Register
    emptyRegisterSet,
    a, b, c, d, e, h, l, f,
    setA, setB, setC, setD, setE, setH, setL,
+   getA, getB, getC, getD, getE, getH, getL,
    bc, de, hl, pc, sp,
    setPC, setSP,
    zero, setZero,
@@ -87,6 +88,34 @@ setL registerSet byte = registerSet { l = EightBitRegister byte }
 setPC registerSet word = registerSet { pc = SixteenBitRegister word }
 
 setSP registerSet word = registerSet { sp = SixteenBitRegister word }
+
+getByte (EightBitRegister byte) = byte
+
+getWord (SixteenBitRegister word) = word
+
+getA = getByte . a
+
+getB = getByte . b
+
+getC = getByte . c
+
+getD = getByte . d
+
+getE = getByte . e
+
+getH = getByte . h
+
+getL = getByte . l
+
+getBC = getWord . bc
+
+getDE = getWord . de
+
+getHL = getWord . hl
+
+getPC = getWord . pc
+
+getSP = getWord . sp
 
 getFlag bit registerSet = flip testBit bit $ f registerSet
 
