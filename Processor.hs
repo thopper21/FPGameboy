@@ -61,7 +61,10 @@ data Instruction =
    JP WordArg |
    JPC JumpCondition WordArg |
    JR ByteArg |
-   JRC JumpCondition ByteArg
+   JRC JumpCondition ByteArg |
+   CALL WordArg |
+   CALLC JumpCondition WordArg
+   
 
 newtype Time = Time Int   
    
@@ -295,6 +298,11 @@ instruction (Byte opCode) secondInstruction =
       0x28 -> JRC JumpZ ImmediateByte
       0x30 -> JRC JumpNC ImmediateByte
       0x38 -> JRC JumpC ImmediateByte
+      0xCD -> CALL ImmediateWord
+      0xC4 -> CALLC JumpNZ ImmediateWord
+      0xCC -> CALLC JumpZ ImmediateWord
+      0xD4 -> CALLC JumpNC ImmediateWord
+      0xDC -> CALLC JumpC ImmediateWord
       
 complexInstruction (Byte opCode) =
    case opCode of
