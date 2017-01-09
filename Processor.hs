@@ -16,7 +16,17 @@ data Instruction =
    LD16 WordArg WordArg |
    LDHL WordArg ByteArg |
    PUSH WordArg |
-   POP WordArg
+   POP WordArg |
+   ADD ByteArg |
+   ADC ByteArg |
+   SUB ByteArg |
+   SBC ByteArg |
+   AND ByteArg |
+   OR ByteArg |
+   XOR ByteArg |
+   CP ByteArg |
+   INC ByteArg |
+   DEC ByteArg
 
 newtype Time = Time Int   
    
@@ -124,3 +134,91 @@ instruction (Byte opCode) =
       0xC1 -> POP BC
       0xD1 -> POP DE
       0xE1 -> POP HL
+      0x87 -> ADD A
+      0x80 -> ADD B
+      0x81 -> ADD C
+      0x82 -> ADD D
+      0x83 -> ADD E
+      0x84 -> ADD H
+      0x85 -> ADD L
+      0x86 -> ADD (BytePointer HL)
+      0xC6 -> ADD ImmediateByte
+      0x8F -> ADC A
+      0x88 -> ADC B
+      0x89 -> ADC C
+      0x8A -> ADC D
+      0x8B -> ADC E
+      0x8C -> ADC H
+      0x8D -> ADC L
+      0x8E -> ADC (BytePointer HL)
+      0xCE -> ADC ImmediateByte
+      0x97 -> SUB A
+      0x90 -> SUB B
+      0x91 -> SUB C
+      0x92 -> SUB D
+      0x93 -> SUB E
+      0x94 -> SUB H
+      0x95 -> SUB L
+      0x96 -> SUB (BytePointer HL)
+      0xD6 -> SUB ImmediateByte
+      0x9F -> SBC A
+      0x98 -> SBC B
+      0x99 -> SBC C
+      0x9A -> SBC D
+      0x9B -> SBC E
+      0x9C -> SBC H
+      0x9D -> SBC L
+      0x9E -> SBC (BytePointer HL)
+      0xDE -> SBC ImmediateByte
+      0xA7 -> AND A
+      0xA0 -> AND B
+      0xA1 -> AND C
+      0xA2 -> AND D
+      0xA3 -> AND E
+      0xA4 -> AND H
+      0xA5 -> AND L
+      0xA6 -> AND (BytePointer HL)
+      0xE6 -> AND ImmediateByte
+      0xB7 -> OR A
+      0xB0 -> OR B
+      0xB1 -> OR C
+      0xB2 -> OR D
+      0xB3 -> OR E
+      0xB4 -> OR H
+      0xB5 -> OR L
+      0xB6 -> OR (BytePointer HL)
+      0xF6 -> OR ImmediateByte
+      0xAF -> XOR A
+      0xA8 -> XOR B
+      0xA9 -> XOR C
+      0xAA -> XOR D
+      0xAB -> XOR E
+      0xAC -> XOR H
+      0xAD -> XOR L
+      0xAE -> XOR (BytePointer HL)
+      0xEE -> XOR ImmediateByte
+      0xBF -> CP A
+      0xB8 -> CP B
+      0xB9 -> CP C
+      0xBA -> CP D
+      0xBB -> CP E
+      0xBC -> CP H
+      0xBD -> CP L
+      0xBE -> CP (BytePointer HL)
+      0xFE -> CP ImmediateByte
+      0x3C -> INC A
+      0x04 -> INC B
+      0x0C -> INC C
+      0x14 -> INC D
+      0x1C -> INC E
+      0x24 -> INC H
+      0x2C -> INC L
+      0x34 -> INC (BytePointer HL)
+      0x3D -> DEC A
+      0x05 -> DEC B
+      0x0D -> DEC C
+      0x15 -> DEC D
+      0x1D -> DEC E
+      0x25 -> DEC H
+      0x2D -> DEC L
+      0x35 -> DEC (BytePointer HL)
