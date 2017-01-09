@@ -6,7 +6,7 @@ import Register
 
 data ByteArg = A | B | C | D | E | H | L | BytePointer WordArg | HighRam ByteArg | ImmediateByte
    
-data WordArg = BC | DE | HL | SP | WordPointer WordArg | ImmediateWord
+data WordArg = AF | BC | DE | HL | SP | WordPointer WordArg | ImmediateWord
 
 data Instruction =
    LD ByteArg ByteArg |
@@ -14,7 +14,9 @@ data Instruction =
    LDI ByteArg ByteArg |
    LDH ByteArg ByteArg |
    LD16 WordArg WordArg |
-   LDHL WordArg ByteArg
+   LDHL WordArg ByteArg |
+   PUSH WordArg |
+   POP WordArg
 
 newtype Time = Time Int   
    
@@ -113,4 +115,12 @@ instruction (Byte opCode) =
       0x31 -> LD16 SP ImmediateWord
       0xF9 -> LD16 SP HL
       0xF8 -> LDHL SP ImmediateByte
-      
+      0x08 -> LD16 (WordPointer ImmediateWord) SP
+      0xF5 -> PUSH AF
+      0xC5 -> PUSH BC
+      0xD5 -> PUSH DE
+      0xE5 -> PUSH HL
+      0xF1 -> POP AF
+      0xC1 -> POP BC
+      0xD1 -> POP DE
+      0xE1 -> POP HL
