@@ -26,7 +26,11 @@ data Instruction =
    XOR ByteArg |
    CP ByteArg |
    INC ByteArg |
-   DEC ByteArg
+   DEC ByteArg |
+   ADD16 WordArg |
+   ADDSP ByteArg |
+   INC16 WordArg |
+   DEC16 WordArg
 
 newtype Time = Time Int   
    
@@ -222,3 +226,16 @@ instruction (Byte opCode) =
       0x25 -> DEC H
       0x2D -> DEC L
       0x35 -> DEC (BytePointer HL)
+      0x09 -> ADD16 BC
+      0x19 -> ADD16 DE
+      0x29 -> ADD16 HL
+      0x39 -> ADD16 SP
+      0xE8 -> ADDSP ImmediateByte
+      0x03 -> INC16 BC
+      0x13 -> INC16 DE
+      0x23 -> INC16 HL
+      0x33 -> INC16 SP
+      0x0B -> DEC16 BC
+      0x1B -> DEC16 DE
+      0x2B -> DEC16 HL
+      0x3B -> DEC16 SP
