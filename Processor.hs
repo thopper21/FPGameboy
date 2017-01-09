@@ -9,6 +9,8 @@ data ByteArg = A | B | C | D | E | H | L | BytePointer WordArg | HighRam ByteArg
    
 data WordArg = AF | BC | DE | HL | SP | WordPointer WordArg | ImmediateWord
 
+data JumpCondition = JumpNZ | JumpZ | JumpNC | JumpC
+
 data Instruction =
    LD ByteArg ByteArg |
    LDD ByteArg ByteArg |
@@ -55,7 +57,11 @@ data Instruction =
    SRL ByteArg |
    BIT Word8 ByteArg |
    SET Word8 ByteArg |
-   RES Word8 ByteArg
+   RES Word8 ByteArg |
+   JP WordArg |
+   JPC JumpCondition WordArg |
+   JR ByteArg |
+   JRC JumpCondition ByteArg
 
 newtype Time = Time Int   
    
@@ -278,6 +284,17 @@ instruction (Byte opCode) secondInstruction =
       0x17 -> RLA
       0x0F -> RRCA
       0x1F -> RRA
+      0xC3 -> JP ImmediateWord
+      0xC2 -> JPC JumpNZ ImmediateWord
+      0xCA -> JPC JumpZ ImmediateWord
+      0xD2 -> JPC JumpNC ImmediateWord
+      0xDA -> JPC JumpC ImmediateWord
+      0xE9 -> JP (WordPointer HL)
+      0x18 -> JR ImmediateByte
+      0x20 -> JRC JumpNZ ImmediateByte
+      0x28 -> JRC JumpZ ImmediateByte
+      0x30 -> JRC JumpNC ImmediateByte
+      0x38 -> JRC JumpC ImmediateByte
       
 complexInstruction (Byte opCode) =
    case opCode of
