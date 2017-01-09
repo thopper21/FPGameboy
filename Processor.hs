@@ -31,7 +31,7 @@ data Instruction =
    ADDSP ByteArg |
    INC16 WordArg |
    DEC16 WordArg |
-   SWAP |
+   SWAP ByteArg |
    DAA |
    CPL |
    CCF |
@@ -40,13 +40,24 @@ data Instruction =
    HALT |
    STOP |
    DI |
-   EI
+   EI |
+   RLCA |
+   RLA |
+   RRCA |
+   RRA |
+   RLC ByteArg |
+   RL ByteArg |
+   RRC ByteArg |
+   RR ByteArg |
+   SLA ByteArg |
+   SRA ByteArg |
+   SRL ByteArg
 
 newtype Time = Time Int   
    
 data Operation = Operation Time Instruction
 
-instruction (Byte opCode) =
+instruction (Byte opCode) secondInstruction =
    case opCode of
       0x06 -> LD B ImmediateByte
       0x0E -> LD C ImmediateByte
@@ -249,7 +260,7 @@ instruction (Byte opCode) =
       0x1B -> DEC16 DE
       0x2B -> DEC16 HL
       0x3B -> DEC16 SP
-      0xCB -> SWAP
+      0xCB -> complexInstruction secondInstruction
       0x27 -> DAA
       0x2F -> CPL
       0x3F -> CCF
@@ -259,3 +270,74 @@ instruction (Byte opCode) =
       0x10 -> STOP
       0xF3 -> DI
       0xFB -> EI
+      0x07 -> RLCA
+      0x17 -> RLA
+      0x0F -> RRCA
+      0x1F -> RRA
+      
+complexInstruction (Byte opCode) =
+   case opCode of
+      0x37 -> SWAP A
+      0x30 -> SWAP B
+      0x31 -> SWAP C
+      0x32 -> SWAP D
+      0x33 -> SWAP E
+      0x34 -> SWAP H
+      0x35 -> SWAP L
+      0x36 -> SWAP (BytePointer HL)
+      0x07 -> RLC A
+      0x00 -> RLC B
+      0x01 -> RLC C
+      0x02 -> RLC D
+      0x03 -> RLC E
+      0x04 -> RLC H
+      0x05 -> RLC L
+      0x06 -> RLC (BytePointer HL)
+      0x17 -> RL A
+      0x10 -> RL B
+      0x11 -> RL C
+      0x12 -> RL D
+      0x13 -> RL E
+      0x14 -> RL H
+      0x15 -> RL L
+      0x16 -> RL (BytePointer HL)
+      0x0F -> RRC A
+      0x08 -> RRC B
+      0x09 -> RRC C
+      0x0A -> RRC D
+      0x0B -> RRC E
+      0x0C -> RRC H
+      0x0D -> RRC L
+      0x0E -> RRC (BytePointer HL)
+      0x1F -> RR A
+      0x18 -> RR B
+      0x19 -> RR C
+      0x1A -> RR D
+      0x1B -> RR E
+      0x1C -> RR H
+      0x1D -> RR L
+      0x1E -> RR (BytePointer HL)
+      0x27 -> SLA A
+      0x20 -> SLA B
+      0x21 -> SLA C
+      0x22 -> SLA D
+      0x23 -> SLA E
+      0x24 -> SLA H
+      0x25 -> SLA L
+      0x26 -> SLA (BytePointer HL)
+      0x2F -> SRA A
+      0x28 -> SRA B
+      0x29 -> SRA C
+      0x2A -> SRA D
+      0x2B -> SRA E
+      0x2C -> SRA H
+      0x2D -> SRA L
+      0x2E -> SRA (BytePointer HL)
+      0x3F -> SRL A
+      0x38 -> SRL B
+      0x39 -> SRL C
+      0x3A -> SRL D
+      0x3B -> SRL E
+      0x3C -> SRL H
+      0x3D -> SRL L
+      0x3E -> SRL (BytePointer HL)
