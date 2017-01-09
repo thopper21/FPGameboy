@@ -30,7 +30,17 @@ data Instruction =
    ADD16 WordArg |
    ADDSP ByteArg |
    INC16 WordArg |
-   DEC16 WordArg
+   DEC16 WordArg |
+   SWAP |
+   DAA |
+   CPL |
+   CCF |
+   SCF |
+   NOP |
+   HALT |
+   STOP |
+   DI |
+   EI
 
 newtype Time = Time Int   
    
@@ -239,3 +249,13 @@ instruction (Byte opCode) =
       0x1B -> DEC16 DE
       0x2B -> DEC16 HL
       0x3B -> DEC16 SP
+      0xCB -> SWAP
+      0x27 -> DAA
+      0x2F -> CPL
+      0x3F -> CCF
+      0x37 -> SCF
+      0x00 -> NOP
+      0x76 -> HALT
+      0x10 -> STOP
+      0xF3 -> DI
+      0xFB -> EI
