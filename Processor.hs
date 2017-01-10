@@ -64,7 +64,10 @@ data Instruction =
    JRC JumpCondition ByteArg |
    CALL WordArg |
    CALLC JumpCondition WordArg |
-   RST Word8
+   RST Word8 |
+   RET |
+   RETC JumpCondition |
+   RETI
    
 
 newtype Time = Time Int   
@@ -312,6 +315,12 @@ instruction (Byte opCode) secondInstruction =
       0xEF -> RST 0x28
       0xF7 -> RST 0x30
       0xFF -> RST 0x38
+      0xC9 -> RET
+      0xC0 -> RETC JumpNZ
+      0xC8 -> RETC JumpZ
+      0xD0 -> RETC JumpNC
+      0xD8 -> RETC JumpC
+      0xD9 -> RETI
       
 complexInstruction (Byte opCode) =
    case opCode of
