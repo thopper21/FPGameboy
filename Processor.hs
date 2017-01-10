@@ -65,11 +65,6 @@ data Instruction =
    RETC JumpCondition |
    RETI |
    COMPOUND
-   
-
-newtype Time = Time Int   
-   
-data Operation = Operation Time Instruction
 
 instruction (Byte opCode) =
    case opCode of
