@@ -67,14 +67,15 @@ data Instruction =
    RST Word8 |
    RET |
    RETC JumpCondition |
-   RETI
+   RETI |
+   COMPOUND
    
 
 newtype Time = Time Int   
    
 data Operation = Operation Time Instruction
 
-instruction (Byte opCode) secondInstruction =
+instruction (Byte opCode) =
    case opCode of
       0x06 -> LD B ImmediateByte
       0x0E -> LD C ImmediateByte
@@ -277,7 +278,7 @@ instruction (Byte opCode) secondInstruction =
       0x1B -> DEC16 DE
       0x2B -> DEC16 HL
       0x3B -> DEC16 SP
-      0xCB -> complexInstruction secondInstruction
+      0xCB -> COMPOUND
       0x27 -> DAA
       0x2F -> CPL
       0x3F -> CCF
@@ -322,7 +323,7 @@ instruction (Byte opCode) secondInstruction =
       0xD8 -> RETC JumpC
       0xD9 -> RETI
       
-complexInstruction (Byte opCode) =
+compoundInstruction (Byte opCode) =
    case opCode of
       0x37 -> SWAP A
       0x30 -> SWAP B
