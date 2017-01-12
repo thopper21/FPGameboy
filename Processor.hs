@@ -1,7 +1,9 @@
 module Processor where
 
 import Data
+import Data.Bits
 import Data.Word
+import GameBoy
 import Memory
 import Register
 
@@ -66,7 +68,7 @@ data Instruction =
    RETI |
    COMPOUND
 
-instruction (Byte opCode) =
+getInstruction (Byte opCode) =
    case opCode of
       0x3E -> (LD A ImmediateByte, 8)
       0x06 -> (LD B ImmediateByte, 8)
@@ -314,7 +316,7 @@ instruction (Byte opCode) =
       0xD8 -> (RETC JumpC, 8)
       0xD9 -> (RETI, 8)
       
-compoundInstruction (Byte opCode) =
+getCompoundInstruction (Byte opCode) =
    case opCode of
       0x37 -> (SWAP A, 8)
       0x30 -> (SWAP B, 8)
@@ -572,3 +574,52 @@ compoundInstruction (Byte opCode) =
       0xFC -> (SET 7 H, 8)
       0xFD -> (SET 7 L, 8)
       0xFE -> (SET 7 (BytePointer HL), 16)
+      
+step gameBoy =
+   let
+      programCounter = getPC $ registers gameBoy
+      pcAddress = Address programCounter
+      opCode = readByte (memory gameBoy) pcAddress
+      (nextInstruction, time) = getInstruction opCode
+   in
+      executeInstruction gameBoy nextInstruction
+
+readByteArg gameBoy byteArg =
+   let
+      reg = registers gameBoy
+      mem = memory gameBoy
+   in case byteArg of
+      A -> getA reg
+      B -> getB reg
+      C -> getC reg
+      D -> getD reg
+      E -> getE reg
+      H -> getH reg
+      L -> getL reg
+      BytePointer address -> readByte mem $ Address (readWordArg gameBoy address)
+      HighRam addressArg ->
+         let
+            (Byte highAddress) = readByteArg gameBoy addressArg
+            address = Word (0xFF00 .|. fromIntegral highAddress)
+         in
+            readByte mem $ Address address
+      ImmediateByte -> readByte mem $ Address (getPC reg)
+      
+readWordArg gameBoy wordArg =
+   let
+      reg = registers gameBoy
+      mem = memory gameBoy
+   in case wordArg of
+      AF -> getAF reg
+      BC -> getBC reg
+      DE -> getDE reg
+      HL -> getHL reg
+      SP -> getSP reg
+      WordPointer address -> readWord mem $ Address (readWordArg gameBoy address)
+      ImmediateWord -> readWord mem $ Address (getPC reg)
+      
+executeInstruction gameBoy instruction =
+   let
+      load to from = gameBoy
+   in case instruction of
+      LD to from -> load to from

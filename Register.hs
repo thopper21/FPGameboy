@@ -7,8 +7,9 @@ module Register
    a, b, c, d, e, h, l, f,
    setA, setB, setC, setD, setE, setH, setL,
    getA, getB, getC, getD, getE, getH, getL,
-   bc, de, hl, pc, sp,
+   af, bc, de, hl, pc, sp,
    setPC, setSP,
+   getPC, getSP, getAF, getBC, getDE, getHL,
    zero, setZero,
    subtraction, setSubtraction,
    halfCarry, setHalfCarry,
@@ -65,6 +66,8 @@ sixteenBitRegister getHighRegister getLowRegister registerSet =
       low = fromIntegral lowRegister
    in SixteenBitRegister $ high .|. low
 
+af = sixteenBitRegister a f
+
 bc = sixteenBitRegister b c
 
 de = sixteenBitRegister d c
@@ -106,6 +109,8 @@ getE = getByte . e
 getH = getByte . h
 
 getL = getByte . l
+
+getAF = getWord . af
 
 getBC = getWord . bc
 

@@ -3,7 +3,8 @@ module Memory
    (Address(..),
    MemoryMap,
    newMemoryMap,
-   readByte, writeByte)
+   readByte, writeByte,
+   readWord, writeWord)
 where
 
 import Data
@@ -95,6 +96,16 @@ readByteFromMappedAddress memoryMap mappedAddress =
 
 readByte memoryMap address = readByteFromMappedAddress memoryMap $ createMappedAddress address
 
+readWord memoryMap address@(Address (Word word)) =
+   let
+      lowByte = readByte memoryMap address
+      highAddress = readByte memoryMap $ Address (Word $ word + 1)
+      highByte = readByte memoryMap address
+      lowWord = fromIntegral lowByte
+      highWord = shift (fromIntegral highByte) 8
+   in
+      Word (highWord .|. lowWord)
+
 writeByteToBank (MemoryBank bankData) address byte = MemoryBank (bankData // [(address, byte)])
 
 writeByteToBankAtIndex memoryBanks index address byte =
@@ -134,3 +145,13 @@ writeByteToMappedAddress memoryMap mappedAddress byte = case mappedAddress of
    InterruptEnableRegister -> memoryMap { interruptEnableRegister = byte }
 
 writeByte memoryMap address = writeByteToMappedAddress memoryMap $ createMappedAddress address
+
+writeWord memoryMap address@(Address (Word addressWord)) (Word word) =
+   let
+      lowWord = word .&. 0xFF
+      highWord = shiftR word 8 .&. 0xFF
+      lowByte = fromIntegral lowWord
+      highByte = fromIntegral highWord
+      memoryMap' = writeByte memoryMap address lowByte
+      memoryMap'' = writeByte memoryMap' (Address (Word addressWord + 1)) highByte
+   in memoryMap''
